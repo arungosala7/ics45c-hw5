@@ -105,3 +105,13 @@ String::~String() {
 String::String(String&& s) : head(s.head) {
     s.head = nullptr;
 }
+
+String& String::operator=(String&& s) {
+    if (this != &s) {
+        list::free(head);
+        head = s.head;
+        s.head = nullptr;
+    }
+
+    return *this;
+}
