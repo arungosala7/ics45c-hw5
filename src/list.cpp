@@ -131,4 +131,55 @@ Node* last(Node* head) {
 
     return head;
 }
+
+int index(Node* head, Node* node) {
+    int result = 0;
+
+    while (head != node) {
+        head = head->next;
+        ++result;
+    }
+
+    return result;
+}
+
+Node* find_char(Node* head, char c) {
+    for (Node* cur = head; cur != nullptr; cur = cur->next) {
+        if (cur->data == c) {
+            return cur;
+        }
+    }
+
+    return nullptr;
+}
+
+Node* find_list(Node* haystack, Node* needle) {
+    if (needle == nullptr) {
+        return haystack;
+    }
+
+    int needle_length = length(needle);
+
+    for (Node* cur = haystack; cur != nullptr; cur = cur->next) {
+        if (compare(cur, needle, needle_length) == 0) {
+            return cur;
+        }
+    }
+
+    return nullptr;
+}
+
+Node* nth(Node* head, int n) {
+    if (n < 0) {
+        return nullptr;
+    }
+
+    while (head != nullptr && n > 0) {
+        head = head->next;
+        --n;
+    }
+
+    return head;
+}
+
 }
