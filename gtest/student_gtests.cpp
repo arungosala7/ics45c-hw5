@@ -34,6 +34,88 @@ TEST(ListTests, Length) {
 // Add remaining tests below. All tests should follow
 // the format of `TEST(ListTests, <TestName>){}`.
 
-TEST(ListTests, ReplaceMe) {
-    EXPECT_TRUE(false);
+TEST(ListTests, FromStringEmpty) {
+    list::Node* head = list::from_string("");
+    EXPECT_EQ(head, nullptr);
+}
+
+TEST(ListTests, FromStringOneNode) {
+    list::Node* head = list::from_string("a");
+    ASSERT_NE(head, nullptr);
+    EXPECT_EQ(head->data, 'a');
+    EXPECT_EQ(head->next, nullptr);
+    list::free(head);
+}
+
+TEST(ListTests, FromStringTwoNodes) {
+    list::Node* head = list::from_string("ab");
+    ASSERT_NE(head, nullptr);
+    ASSERT_NE(head->next, nullptr);
+    EXPECT_EQ(head->data, 'a');
+    EXPECT_EQ(head->next->data, 'b');
+    EXPECT_EQ(head->next->next, nullptr);
+    list::free(head);
+}
+
+TEST(ListTests, FromStringKeepsOrder) {
+    const char* text = "hello";
+    list::Node* head = list::from_string(text);
+    list::Node* cur = head;
+
+    for (int i = 0; i < 5; ++i) {
+        ASSERT_NE(cur, nullptr);
+        EXPECT_EQ(cur->data, text[i]);
+        cur = cur->next;
+    }
+
+    EXPECT_EQ(cur, nullptr);
+    list::free(head);
+}
+
+TEST(ListTests, LengthEmpty) {
+    EXPECT_EQ(list::length(nullptr), 0);
+}
+
+TEST(ListTests, LengthOneNode) {
+    list::Node* head = list::from_string("a");
+    EXPECT_EQ(list::length(head), 1);
+    list::free(head);
+}
+
+TEST(ListTests, LengthTwoNodes) {
+    list::Node* head = list::from_string("ab");
+    EXPECT_EQ(list::length(head), 2);
+    list::free(head);
+}
+
+TEST(ListTests, LengthManyNodes) {
+    list::Node* head = list::from_string("hello world");
+    EXPECT_EQ(list::length(head), 11);
+    list::free(head);
+}
+
+TEST(ListTests, PrintEmpty) {
+    std::stringstream out;
+    list::print(out, nullptr);
+    EXPECT_EQ(out.str(), "");
+}
+
+TEST(ListTests, PrintOneNode) {
+    list::Node* head = list::from_string("a");
+    std::stringstream out;
+    list::print(out, head);
+    EXPECT_EQ(out.str(), "a");
+    list::free(head);
+}
+
+TEST(ListTests, PrintManyNodes) {
+    list::Node* head = list::from_string("hello");
+    std::stringstream out;
+    list::print(out, head);
+    EXPECT_EQ(out.str(), "hello");
+    list::free(head);
+}
+
+TEST(ListTests, FreeEmpty) {
+    list::free(nullptr);
 }
