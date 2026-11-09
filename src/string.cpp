@@ -101,3 +101,7 @@ std::istream& operator>>(std::istream& in, String& s) {
 String::~String() {
     list::free(head);
 }
+
+String::String(String&& s) : head(s.head) {
+    s.head = nullptr;
+}
