@@ -119,3 +119,223 @@ TEST(ListTests, PrintManyNodes) {
 TEST(ListTests, FreeEmpty) {
     list::free(nullptr);
 }
+
+static std::string to_text(list::Node* head) {
+    std::stringstream out;
+    list::print(out, head);
+    return out.str();
+}
+
+static bool shares_nodes(list::Node* a, list::Node* b) {
+    for (list::Node* x = a; x != nullptr; x = x->next) {
+        for (list::Node* y = b; y != nullptr; y = y->next) {
+            if (x == y) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+TEST(ListTests, CopyEmpty) {
+    EXPECT_EQ(list::copy(nullptr), nullptr);
+}
+
+TEST(ListTests, CopyOneNode) {
+    list::Node* head = list::from_string("a");
+    list::Node* result = list::copy(head);
+    EXPECT_EQ(to_text(result), "a");
+    EXPECT_FALSE(shares_nodes(head, result));
+    list::free(head);
+    list::free(result);
+}
+
+TEST(ListTests, CopyManyNodes) {
+    list::Node* head = list::from_string("hello");
+    list::Node* result = list::copy(head);
+    EXPECT_EQ(to_text(result), "hello");
+    EXPECT_EQ(to_text(head), "hello");
+    EXPECT_FALSE(shares_nodes(head, result));
+    list::free(head);
+    list::free(result);
+}
+
+TEST(ListTests, CompareBothEmpty) {
+    EXPECT_EQ(list::compare(nullptr, nullptr), 0);
+}
+
+TEST(ListTests, CompareOneEmpty) {
+    list::Node* head = list::from_string("a");
+    EXPECT_LT(list::compare(nullptr, head), 0);
+    EXPECT_GT(list::compare(head, nullptr), 0);
+    list::free(head);
+}
+
+TEST(ListTests, CompareEqual) {
+    list::Node* a = list::from_string("abc");
+    list::Node* b = list::from_string("abc");
+    EXPECT_EQ(list::compare(a, b), 0);
+    list::free(a);
+    list::free(b);
+}
+
+TEST(ListTests, CompareFirstCharDiffers) {
+    list::Node* a = list::from_string("abc");
+    list::Node* b = list::from_string("xbc");
+    EXPECT_LT(list::compare(a, b), 0);
+    EXPECT_GT(list::compare(b, a), 0);
+    list::free(a);
+    list::free(b);
+}
+
+TEST(ListTests, CompareLastCharDiffers) {
+    list::Node* a = list::from_string("abc");
+    list::Node* b = list::from_string("abd");
+    EXPECT_LT(list::compare(a, b), 0);
+    EXPECT_GT(list::compare(b, a), 0);
+    list::free(a);
+    list::free(b);
+}
+
+TEST(ListTests, ComparePrefixIsSmaller) {
+    list::Node* a = list::from_string("ab");
+    list::Node* b = list::from_string("abc");
+    EXPECT_LT(list::compare(a, b), 0);
+    EXPECT_GT(list::compare(b, a), 0);
+    list::free(a);
+    list::free(b);
+}
+
+TEST(ListTests, CompareNZero) {
+    list::Node* a = list::from_string("abc");
+    list::Node* b = list::from_string("xyz");
+    EXPECT_EQ(list::compare(a, b, 0), 0);
+    EXPECT_EQ(list::compare(nullptr, nullptr, 0), 0);
+    EXPECT_EQ(list::compare(a, nullptr, 0), 0);
+    list::free(a);
+    list::free(b);
+}
+
+TEST(ListTests, CompareNStopsAtN) {
+    list::Node* a = list::from_string("abcd");
+    list::Node* b = list::from_string("abxy");
+    EXPECT_EQ(list::compare(a, b, 2), 0);
+    EXPECT_LT(list::compare(a, b, 3), 0);
+    EXPECT_GT(list::compare(b, a, 3), 0);
+    list::free(a);
+    list::free(b);
+}
+
+TEST(ListTests, CompareNLargerThanLists) {
+    list::Node* a = list::from_string("abc");
+    list::Node* b = list::from_string("abc");
+    EXPECT_EQ(list::compare(a, b, 10), 0);
+    list::free(a);
+    list::free(b);
+}
+
+TEST(ListTests, CompareNOneListEndsFirst) {
+    list::Node* a = list::from_string("ab");
+    list::Node* b = list::from_string("abc");
+    EXPECT_EQ(list::compare(a, b, 2), 0);
+    EXPECT_LT(list::compare(a, b, 3), 0);
+    EXPECT_GT(list::compare(b, a, 3), 0);
+    list::free(a);
+    list::free(b);
+}
+
+TEST(ListTests, CompareNOneEmpty) {
+    list::Node* head = list::from_string("a");
+    EXPECT_LT(list::compare(nullptr, head, 1), 0);
+    EXPECT_GT(list::compare(head, nullptr, 1), 0);
+    EXPECT_EQ(list::compare(nullptr, nullptr, 5), 0);
+    list::free(head);
+}
+
+TEST(ListTests, ReverseEmpty) {
+    EXPECT_EQ(list::reverse(nullptr), nullptr);
+}
+
+TEST(ListTests, ReverseOneNode) {
+    list::Node* head = list::from_string("a");
+    list::Node* result = list::reverse(head);
+    EXPECT_EQ(to_text(result), "a");
+    EXPECT_FALSE(shares_nodes(head, result));
+    list::free(head);
+    list::free(result);
+}
+
+TEST(ListTests, ReverseTwoNodes) {
+    list::Node* head = list::from_string("ab");
+    list::Node* result = list::reverse(head);
+    EXPECT_EQ(to_text(result), "ba");
+    EXPECT_EQ(to_text(head), "ab");
+    EXPECT_FALSE(shares_nodes(head, result));
+    list::free(head);
+    list::free(result);
+}
+
+TEST(ListTests, ReverseManyNodes) {
+    list::Node* head = list::from_string("hello");
+    list::Node* result = list::reverse(head);
+    EXPECT_EQ(to_text(result), "olleh");
+    EXPECT_EQ(to_text(head), "hello");
+    EXPECT_FALSE(shares_nodes(head, result));
+    list::free(head);
+    list::free(result);
+}
+
+TEST(ListTests, AppendBothEmpty) {
+    EXPECT_EQ(list::append(nullptr, nullptr), nullptr);
+}
+
+TEST(ListTests, AppendLeftEmpty) {
+    list::Node* rhs = list::from_string("abc");
+    list::Node* result = list::append(nullptr, rhs);
+    EXPECT_EQ(to_text(result), "abc");
+    EXPECT_FALSE(shares_nodes(rhs, result));
+    list::free(rhs);
+    list::free(result);
+}
+
+TEST(ListTests, AppendRightEmpty) {
+    list::Node* lhs = list::from_string("abc");
+    list::Node* result = list::append(lhs, nullptr);
+    EXPECT_EQ(to_text(result), "abc");
+    EXPECT_FALSE(shares_nodes(lhs, result));
+    list::free(lhs);
+    list::free(result);
+}
+
+TEST(ListTests, AppendBothNonEmpty) {
+    list::Node* lhs = list::from_string("foo");
+    list::Node* rhs = list::from_string("bar");
+    list::Node* result = list::append(lhs, rhs);
+    EXPECT_EQ(to_text(result), "foobar");
+    EXPECT_EQ(to_text(lhs), "foo");
+    EXPECT_EQ(to_text(rhs), "bar");
+    EXPECT_FALSE(shares_nodes(lhs, result));
+    EXPECT_FALSE(shares_nodes(rhs, result));
+    list::free(lhs);
+    list::free(rhs);
+    list::free(result);
+}
+
+TEST(ListTests, LastOneNode) {
+    list::Node* head = list::from_string("a");
+    EXPECT_EQ(list::last(head), head);
+    list::free(head);
+}
+
+TEST(ListTests, LastTwoNodes) {
+    list::Node* head = list::from_string("ab");
+    EXPECT_EQ(list::last(head), head->next);
+    list::free(head);
+}
+
+TEST(ListTests, LastManyNodes) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::last(head), head->next->next);
+    list::free(head);
+}
