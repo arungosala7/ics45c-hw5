@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "list.hpp"
+#include <sstream>
+#include <string>
 
 using namespace std;
 using list::Node;
@@ -338,4 +340,192 @@ TEST(ListTests, LastManyNodes) {
     list::Node* head = list::from_string("abc");
     EXPECT_EQ(list::last(head), head->next->next);
     list::free(head);
+}
+TEST(ListTests, IndexFirstNode) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::index(head, head), 0);
+    list::free(head);
+}
+
+TEST(ListTests, IndexMiddleNode) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::index(head, head->next), 1);
+    list::free(head);
+}
+
+TEST(ListTests, IndexLastNode) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::index(head, head->next->next), 2);
+    list::free(head);
+}
+
+TEST(ListTests, IndexRepeatedCharsUsesNode) {
+    list::Node* head = list::from_string("aaa");
+    EXPECT_EQ(list::index(head, head->next->next), 2);
+    list::free(head);
+}
+
+TEST(ListTests, FindCharEmpty) {
+    EXPECT_EQ(list::find_char(nullptr, 'a'), nullptr);
+}
+
+TEST(ListTests, FindCharFirstNode) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::find_char(head, 'a'), head);
+    list::free(head);
+}
+
+TEST(ListTests, FindCharMiddleNode) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::find_char(head, 'b'), head->next);
+    list::free(head);
+}
+
+TEST(ListTests, FindCharLastNode) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::find_char(head, 'c'), head->next->next);
+    list::free(head);
+}
+
+TEST(ListTests, FindCharReturnsFirstMatch) {
+    list::Node* head = list::from_string("abab");
+    EXPECT_EQ(list::find_char(head, 'b'), head->next);
+    list::free(head);
+}
+
+TEST(ListTests, FindCharMissing) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::find_char(head, 'z'), nullptr);
+    list::free(head);
+}
+
+TEST(ListTests, FindCharNullCharacter) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::find_char(head, '\0'), nullptr);
+    list::free(head);
+}
+
+TEST(ListTests, FindListBothEmpty) {
+    EXPECT_EQ(list::find_list(nullptr, nullptr), nullptr);
+}
+
+TEST(ListTests, FindListEmptyNeedle) {
+    list::Node* haystack = list::from_string("abc");
+    EXPECT_EQ(list::find_list(haystack, nullptr), haystack);
+    list::free(haystack);
+}
+
+TEST(ListTests, FindListEmptyHaystack) {
+    list::Node* needle = list::from_string("a");
+    EXPECT_EQ(list::find_list(nullptr, needle), nullptr);
+    list::free(needle);
+}
+
+TEST(ListTests, FindListExactMatch) {
+    list::Node* haystack = list::from_string("abc");
+    list::Node* needle = list::from_string("abc");
+    EXPECT_EQ(list::find_list(haystack, needle), haystack);
+    list::free(haystack);
+    list::free(needle);
+}
+
+TEST(ListTests, FindListAtStart) {
+    list::Node* haystack = list::from_string("abcd");
+    list::Node* needle = list::from_string("ab");
+    EXPECT_EQ(list::find_list(haystack, needle), haystack);
+    list::free(haystack);
+    list::free(needle);
+}
+
+TEST(ListTests, FindListInMiddle) {
+    list::Node* haystack = list::from_string("abcd");
+    list::Node* needle = list::from_string("bc");
+    EXPECT_EQ(list::find_list(haystack, needle), haystack->next);
+    list::free(haystack);
+    list::free(needle);
+}
+
+TEST(ListTests, FindListAtEnd) {
+    list::Node* haystack = list::from_string("abcd");
+    list::Node* needle = list::from_string("cd");
+    EXPECT_EQ(list::find_list(haystack, needle), haystack->next->next);
+    list::free(haystack);
+    list::free(needle);
+}
+
+TEST(ListTests, FindListFailsPartwayThenMatches) {
+    list::Node* haystack = list::from_string("aaab");
+    list::Node* needle = list::from_string("aab");
+    EXPECT_EQ(list::find_list(haystack, needle), haystack->next);
+    list::free(haystack);
+    list::free(needle);
+}
+
+TEST(ListTests, FindListReturnsFirstMatch) {
+    list::Node* haystack = list::from_string("abab");
+    list::Node* needle = list::from_string("ab");
+    EXPECT_EQ(list::find_list(haystack, needle), haystack);
+    list::free(haystack);
+    list::free(needle);
+}
+
+TEST(ListTests, FindListNeedleRunsPastEnd) {
+    list::Node* haystack = list::from_string("abc");
+    list::Node* needle = list::from_string("cd");
+    EXPECT_EQ(list::find_list(haystack, needle), nullptr);
+    list::free(haystack);
+    list::free(needle);
+}
+
+TEST(ListTests, FindListNeedleLongerThanHaystack) {
+    list::Node* haystack = list::from_string("ab");
+    list::Node* needle = list::from_string("abc");
+    EXPECT_EQ(list::find_list(haystack, needle), nullptr);
+    list::free(haystack);
+    list::free(needle);
+}
+
+TEST(ListTests, FindListMissing) {
+    list::Node* haystack = list::from_string("abc");
+    list::Node* needle = list::from_string("xy");
+    EXPECT_EQ(list::find_list(haystack, needle), nullptr);
+    list::free(haystack);
+    list::free(needle);
+}
+
+TEST(ListTests, NthFirstNode) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::nth(head, 0), head);
+    list::free(head);
+}
+
+TEST(ListTests, NthMiddleNode) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::nth(head, 1), head->next);
+    list::free(head);
+}
+
+TEST(ListTests, NthLastNode) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::nth(head, 2), head->next->next);
+    list::free(head);
+}
+
+TEST(ListTests, NthOnePastEnd) {
+    list::Node* head = list::from_string("abc");
+    EXPECT_EQ(list::nth(head, 3), nullptr);
+    list::free(head);
+}
+
+TEST(ListTests, LongListWorks) {
+    std::string text(5000, 'a');
+    list::Node* head = list::from_string(text.c_str());
+    list::Node* copied = list::copy(head);
+    list::Node* reversed = list::reverse(head);
+    EXPECT_EQ(list::length(head), 5000);
+    EXPECT_EQ(list::length(copied), 5000);
+    EXPECT_EQ(list::length(reversed), 5000);
+    list::free(head);
+    list::free(copied);
+    list::free(reversed);
 }
